@@ -10,7 +10,11 @@ class EbirdbotSpider(scrapy.Spider):
         super(EbirdbotSpider, self).__init__(*args, **kwargs)
         self.start_urls = ['%s' % url]
         print('Start_URLs set as :',self.start_urls)
-    
+    '''
+    start_urls = [
+            'https://ebird.org/hotspot/L3612364?yr=all&m=&rank=mrec',
+            ]
+    '''
     '''
     start_urls = [
             'https://ebird.org/hotspot/L3612364?yr=all&m=&rank=mrec',
@@ -26,13 +30,23 @@ class EbirdbotSpider(scrapy.Spider):
         
        #Extract all the text corresponding to CSS class 'hotspot--name' and 'species-name' in the Hotspot page in ebird
         #hotspot_name = response.css('.hotspot--name::text').extract()     
-        species_names = response.css('.species-name::text').extract()
+        #species_names = response.css('.species-name::text').extract()
+        #Changed the logic as there were structural changes in ebird html
+        species_selector = '.species-name'
+        
+        for item in response.css(species_selector):
+            species_name = 'a ::text'
+            yield {
+                'species': item.css(species_name).extract(),
+                }
 
+    '''
+        #Below was the logic originally for extracting the species name from ebird scraping
         for item in species_names:
         #    print('Read item is : ',item)
             scraped_info={'species' : item}
             yield scraped_info
-     
+    '''     
     '''
     #Below is the code that I had written when trying to hardcode the multiple URLs and then extract.
     def start_requests(self):
